@@ -6,133 +6,263 @@
     <title>Panel de Administración - Sistema de Inventario</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Estilos previos sin cambios */
-        @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
-            font-weight: bold;
-        }
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Barra lateral */
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        .sidebar h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .sidebar ul li {
-            margin-bottom: 15px;
-        }
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .sidebar ul li a:hover {
-            background-color: #34495e;
-        }
-        
-        /* Contenido principal */
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-        }
-        .header {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .header h2 {
-            margin: 0;
-        }
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .card h3 {
-            margin-top: 0;
-        }
-        .card-content {
-            height: 200px;
-            /* Nuevos estilos para centrar el contenido */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        /* Estilo específico para los números grandes */
-        .big-number {
-            font-size: 3.5em;
-            font-weight: bold;
-            margin: 0;
-            color: #2c3e50;
-        }
-        /* Estilo para el menú desplegable */
-    .dropdown {
-        display: none; /* Oculta el submenú por defecto */
-        list-style: none;
-        padding-left: 20px;
-        margin: auto;
+        @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap");
+
+/* Estilos generales */
+body {
+    font-family: "Montserrat", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Barra lateral */
+.sidebar {
+    width: 280px;
+    background-color: #2c3e50;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 2rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar h1 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0 1.5rem 2rem;
+    margin: 0;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin: 0.5rem 0;
+}
+
+.sidebar ul li a {
+    color: #94a3b8;
+    text-decoration: none;
+    padding: 0.875rem 1.5rem;
+    display: block;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #60a5fa;
+}
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+}
+
+.header {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    color: #1e293b;
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Dashboard Cards */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-content {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo específico para los números grandes */
+.big-number {
+    color: #2c3e50;
+    font-size: 3.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Estilo para el menú desplegable */
+.dropdown {
+    display: none;
+    list-style: none;
+    padding-left: 20px;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+.dropdown li a:hover {
+    background-color: #ccc;
+}
+
+/* Animación para las tarjetas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    .dropdown-toggle:hover + .dropdown, 
-    .dropdown:hover {
-        display: block; /* Muestra el submenú al pasar el ratón */
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .dropdown li a:hover {
-        background-color: #ccc;
+}
+
+.fade-in {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Gráfico de Ventas */
+.chart-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+}
+
+#salesChart {
+    height: 400px !important;
+}
+
+/* Tabla de ventas */
+.products-table {
+    width: 100%;
+    background: white;
+    border-radius: 1rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 2rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.products-table th,
+.products-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.products-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.products-table tr:last-child td {
+    border-bottom: none;
+}
+
+.products-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
     }
-        
-        /* Animaciones */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fade-in {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 1rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1.5rem;
+    }
+
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .big-number {
+        font-size: 2rem;
+    }
+
+    .products-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -251,6 +381,17 @@
                 }
             }
         });
+        document.addEventListener('DOMContentLoaded', () => {
+        // Selecciona el enlace que despliega el submenú
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown');
+
+        // Agrega el evento de clic para alternar la clase 'show'
+        dropdownToggle.addEventListener('click', (event) => {
+            event.preventDefault(); // Evita que el enlace se active
+            dropdownMenu.classList.toggle('show');
+        });
+    });
     </script>
 </body>
 </html>

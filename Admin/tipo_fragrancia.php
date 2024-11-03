@@ -2,72 +2,73 @@
 include("../db/conexion.php");
 
 // Variables de paginación
-$limit = 10; // Número de categorías por página
+$limit = 5; // Número de fragancias por página
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Búsqueda
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Consulta de categorías con paginación y búsqueda
-$sql = "SELECT * FROM categorias WHERE nombre LIKE ? ORDER BY id LIMIT ?, ?";
+// Consulta de fragancias con paginación y búsqueda
+$sql = "SELECT * FROM fragancia WHERE marca LIKE ? ORDER BY id LIMIT ?, ?";
 $stmt = $conexion->prepare($sql);
 $searchParam = "%$search%";
 $stmt->bind_param("sii", $searchParam, $offset, $limit);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Total de categorías para paginación
-$totalSql = "SELECT COUNT(*) FROM categorias WHERE nombre LIKE ?";
+// Total de fragancias para paginación
+$totalSql = "SELECT COUNT(*) FROM fragancia WHERE marca LIKE ?";
 $totalStmt = $conexion->prepare($totalSql);
 $totalStmt->bind_param("s", $searchParam);
 $totalStmt->execute();
 $totalResult = $totalStmt->get_result();
-$totalCategories = $totalResult->fetch_row()[0];
-$totalPages = ceil($totalCategories / $limit);
+$totalFragancias = $totalResult->fetch_row()[0];
+$totalPages = ceil($totalFragancias / $limit);
 
-// Lógica para agregar/editar/eliminar categoría
+// Lógica para agregar/editar/eliminar fragancia
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = $_POST['nombre'];
+    $marca = $_POST['marca'];
+    $tipo_fragancia = $_POST['tipo_fragancia'];
     $descripcion = $_POST['descripcion'];
 
     if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // Editar categoría
+        // Editar fragancia
         $id = (int)$_POST['id'];
-        $updateSql = "UPDATE categorias SET nombre = ?, descripcion = ? WHERE id = ?";
+        $updateSql = "UPDATE fragancia SET marca = ?, tipo_fragancia = ?, descripcion = ?, fecha_actualizacion = NOW() WHERE id = ?";
         $updateStmt = $conexion->prepare($updateSql);
-        $updateStmt->bind_param("ssi", $nombre, $descripcion, $id);
+        $updateStmt->bind_param("sssi", $marca, $tipo_fragancia, $descripcion, $id);
         if ($updateStmt->execute()) {
-            header("Location: categorias.php"); // Redirige para evitar reenvío de formulario
+            header("Location: tipo_fregancia.php"); // Redirige para evitar reenvío de formulario
             exit;
         } else {
-            echo "Error al editar la categoría: " . $conexion->error;
+            echo "Error al editar la fragancia: " . $conexion->error;
         }
     } else {
-        // Agregar nueva categoría
-        $insertSql = "INSERT INTO categorias (nombre, descripcion) VALUES (?, ?)";
+        // Agregar nueva fragancia
+        $insertSql = "INSERT INTO fragancia (marca, tipo_fragancia, descripcion, fecha_creacion) VALUES (?, ?, ?, NOW())";
         $insertStmt = $conexion->prepare($insertSql);
-        $insertStmt->bind_param("ss", $nombre, $descripcion);
+        $insertStmt->bind_param("sss", $marca, $tipo_fragancia, $descripcion);
         if ($insertStmt->execute()) {
-            header("Location: categorias.php"); // Redirige para evitar reenvío de formulario
+            header("Location: tipo_fregancia.php"); // Redirige para evitar reenvío de formulario
             exit;
         } else {
-            echo "Error al agregar la categoría: " . $conexion->error;
+            echo "Error al agregar la fragancia: " . $conexion->error;
         }
     }
 }
 
-// Eliminar categoría
+// Eliminar fragancia
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $deleteSql = "DELETE FROM categorias WHERE id = ?";
+    $deleteSql = "DELETE FROM fragancia WHERE id = ?";
     $deleteStmt = $conexion->prepare($deleteSql);
     $deleteStmt->bind_param("i", $id);
     if ($deleteStmt->execute()) {
-        header("Location: categorias.php"); // Redirige para evitar reenvío de formulario
+        header("Location: tipo_fragrancia.php"); // Redirige para evitar reenvío de formulario
         exit;
     } else {
-        echo "Error al eliminar la categoría: " . $conexion->error;
+        echo "Error al eliminar la fragancia: " . $conexion->error;
     }
 }
 ?>
@@ -309,7 +310,7 @@ if (isset($_GET['delete'])) {
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin: 2px;
+    margin: auto;
 }
 
 .btn-edit {
@@ -327,39 +328,51 @@ if (isset($_GET['delete'])) {
 .btn-delete:hover {
     background-color: #d32f2f;
 }
+/* Botones de acción (editar y eliminar) en línea */
+.categories-table td .btn {
+    display: inline-block;
+    margin-right: 5px;
+}
+/* Estilo para el menú desplegable */
 .dropdown {
     display: none;
     list-style: none;
     padding-left: 20px;
+    margin: auto;
 }
-
+.dropdown {
+    display: none;
+}
 .dropdown.show {
     display: block;
 }
-
 .dropdown li a:hover {
-    background-color: #ccc;
+    background-color: #34495e;
 }
+
+
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="container">
     <?php require 'menu.php'; ?>
         <div class="main-content">
-            <h2>Gestión de Categorías</h2>
+            <h2>Gestión de Fragancias</h2>
             <form class="search-form" action="" method="GET">
-                <input type="text" name="search" placeholder="Buscar categoría..." value="<?php echo htmlspecialchars($search); ?>">
+                <input type="text" name="search" placeholder="Buscar fragancia por marca..." value="<?php echo htmlspecialchars($search); ?>">
                 <button type="submit">Buscar</button>
-                <button type="button" class="add-product-btn" onclick="openModal()">Agregar Categoría</button>
-
+                <button type="button" class="add-product-btn" onclick="openModal()">Agregar Fragancia</button>
             </form>
             
             <table class="categories-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Tipo-Fragancia</th>
                         <th>Descripción</th>
+                        <th>Fecha-Creación</th>
+                        <th>Fecha-Actualización</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -367,41 +380,45 @@ if (isset($_GET['delete'])) {
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
                             <td><?php echo $row['id']; ?></td>
-                            <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                            <td><?php echo htmlspecialchars($row['marca']); ?></td>
+                            <td><?php echo htmlspecialchars($row['tipo_fragancia']); ?></td>
                             <td><?php echo htmlspecialchars($row['descripcion']); ?></td>
+                            <td><?php echo $row['fecha_creacion']; ?></td>
+                            <td><?php echo $row['fecha_actualizacion']; ?></td>
                             <td>
-                            <button class="btn btn-edit"  onclick="editCategory(<?php echo $row['id']; ?>)"><i class="fas fa-edit"></i></button>
-                            <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta categoría?')" class="btn btn-delete"><i class="fas fa-trash-alt"></i></a>
-                            
-                            
+                                <button class="btn btn-edit" onclick="editCategory(<?php echo $row['id']; ?>)"><i class="fas fa-edit"></i></button>
+                                <a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta fragancia?')" class="btn btn-delete"><i class="fas fa-trash-alt"></i></a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
-            <div>
-                <nav>
-                    <ul class="pagination">
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li><a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>" class="<?php echo ($i === $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
-                        <?php endfor; ?>
-                    </ul>
-                </nav>
-            </div>
+            
+            <nav>
+                <ul class="pagination">
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li><a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>" class="<?php echo ($i === $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
             
         </div>
     </div>
 
-    <!-- Modal para agregar/editar categoría -->
+    <!-- Modal para agregar/editar fragancia -->
     <div class="modal" id="categoryModal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Agregar Categoría</h2>
+            <h2 id="modalTitle">Agregar Fragancia</h2>
             <form id="categoryForm" action="" method="POST">
                 <input type="hidden" name="id" id="categoryId">
                 <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" name="nombre" required>
+                    <label for="marca">Marca</label>
+                    <input type="text" name="marca" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo_fragancia">Tipo de Fragancia</label>
+                    <input type="text" name="tipo_fragancia" required>
                 </div>
                 <div class="form-group">
                     <label for="descripcion">Descripción</label>
@@ -413,7 +430,6 @@ if (isset($_GET['delete'])) {
             </form>
         </div>
     </div>
-
     <script>
         function openModal() {
             document.getElementById('categoryModal').style.display = 'flex';
