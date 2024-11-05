@@ -13,7 +13,7 @@ $nombre_usuario = $_SESSION['nombre'] ?? 'Admin'; // Asigna un nombre predetermi
         <img src="<?php echo htmlspecialchars($imagen_perfil); ?>" alt="Foto de perfil" class="profile-img">
         <p class="user-name"><?php echo htmlspecialchars($nombre_usuario); ?></p>
         <a href="cerrar_sesion.php" class="logout-icon" title="Cerrar sesión">
-            <img src="ruta/a/icono/cerrar_sesion.png" alt="Cerrar sesión"> <!-- Reemplaza con la ruta de tu icono -->
+            <img src="imagen/poder.png" alt="Cerrar sesión"> <!-- Reemplaza con la ruta de tu icono -->
         </a>
     </div>
 
