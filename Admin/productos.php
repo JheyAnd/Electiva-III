@@ -1,6 +1,13 @@
 <?php
 include("../db/conexion.php");
 
+//Iniciar la sesión y verificar si el usuario está logueado
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
+
 // Variables de paginación
 $limit = 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;

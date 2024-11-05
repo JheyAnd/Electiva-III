@@ -1,6 +1,12 @@
 <?php
 include("../db/conexion.php");
 
+//Iniciar la sesión y verificar si el usuario está logueado
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
 // Variables de paginación
 $limit = 5; // Número de proveedores por página
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -458,6 +464,27 @@ body {
 .fade-in {
     animation: fadeInUp 0.5s ease-out forwards;
 }
+.user-profile {
+    text-align: center;
+    margin-bottom: 20px; /* Espacio entre la foto y la navegación */
+}
+
+.profile-img {
+    width: 60px; /* Ajusta según tu diseño */
+    height: 60px; /* Ajusta según tu diseño */
+    border-radius: 50%; /* Hace que la imagen sea circular */
+}
+
+.user-name {
+    font-weight: bold;
+    margin: 5px 0; /* Espaciado entre el nombre y el icono */
+}
+
+.logout-icon img {
+    width: 20px; /* Ajusta según tu diseño */
+    height: 20px; /* Ajusta según tu diseño */
+}
+
     </style>
 </head>
 <body>

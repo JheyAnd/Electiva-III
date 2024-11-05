@@ -340,6 +340,27 @@ if (isset($_GET['delete'])) {
 .dropdown li a:hover {
     background-color: #ccc;
 }
+.user-profile {
+    text-align: center;
+    margin-bottom: 20px; /* Espacio entre la foto y la navegación */
+}
+
+.profile-img {
+    width: 60px; /* Ajusta según tu diseño */
+    height: 60px; /* Ajusta según tu diseño */
+    border-radius: 50%; /* Hace que la imagen sea circular */
+}
+
+.user-name {
+    font-weight: bold;
+    margin: 5px 0; /* Espaciado entre el nombre y el icono */
+}
+
+.logout-icon img {
+    width: 20px; /* Ajusta según tu diseño */
+    height: 20px; /* Ajusta según tu diseño */
+}
+
     </style>
 </head>
 <body>
