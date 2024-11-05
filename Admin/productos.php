@@ -172,7 +172,13 @@ if (isset($_GET['delete'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tiny.cloud/1/4wgg1xab2nj9kzu81qhsw5zn5elf9on5neq24w6lmvzamuop/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    
+
+    <style>
+        <?php 
+        require_once "style.css";
+        ?>
+        </style>
 </head>
 <body>
 <div class="container">

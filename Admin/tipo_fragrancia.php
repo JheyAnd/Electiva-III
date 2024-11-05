@@ -145,6 +145,34 @@ if (isset($_GET['delete'])) {
             background-color: rgba(255, 255, 255, 0.1);
             border-left-color: #60a5fa;
         }
+        /* Estilos de la barra de desplazamiento para navegadores WebKit (Chrome, Safari) */
+.sidebar::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #34495e; /* Color de fondo del track */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #60a5fa; /* Color de la barra de desplazamiento */
+    border-radius: 50%; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #007bff; /* Color cuando se pasa el mouse */
+}
+
+/* Estilos de la barra de desplazamiento para Firefox */
+.sidebar {
+    scrollbar-width: thin; /* Ancho de la barra de desplazamiento */
+    scrollbar-color: #60a5fa #34495e; /* Color de la barra y el track */
+}
+
+/* Estilos para navegadores que no soportan barra de desplazamiento personalizada */
+.sidebar {
+    overflow-y: auto; /* Permitir desplazamiento vertical */
+}
         /* Contenido principal */
         .main-content {
             flex-grow: 1;

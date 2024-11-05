@@ -93,19 +93,20 @@ if (isset($_GET['delete'])) {
             display: flex;
             min-height: 100vh;
         }
-        /* Barra lateral */
         .sidebar {
-            width: 280px;
-            background-color: #2c3e50;
-            color: white;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            padding-top: 2rem;
-            transition: all 0.3s ease;
-            overflow-y: auto;
-        }
+    width: 280px;
+    background-color: #2c3e50;
+    color: white;
+    height: 100vh; /* Ajusta la altura si tienes una cabecera de 60px */
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 2rem;
+    transition: all 0.3s ease;
+    /* Si deseas que la barra lateral no tenga borde en el contenido, puedes usar */
+    border-right: 1px solid rgba(255, 255, 255, 0.1); /* Borde derecho opcional */
+    overflow-y: auto;
+}
         .sidebar h1 {
             color: white;
             font-size: 1.5rem;
@@ -137,6 +138,30 @@ if (isset($_GET['delete'])) {
             background-color: rgba(255, 255, 255, 0.1);
             border-left-color: #60a5fa;
         }
+        /* Estilos de la barra de desplazamiento para navegadores WebKit (Chrome, Safari) */
+        .sidebar::-webkit-scrollbar {
+            width: 8px; /* Ancho de la barra de desplazamiento */
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #34495e; /* Color de fondo del track */
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #60a5fa; /* Color de la barra de desplazamiento */
+            border-radius: 50%; /* Bordes redondeados */
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #007bff; /* Color cuando se pasa el mouse */
+        }
+
+        /* Estilos de la barra de desplazamiento para Firefox */
+        .sidebar {
+            scrollbar-width: thin; /* Ancho de la barra de desplazamiento */
+            scrollbar-color: #60a5fa #34495e; /* Color de la barra y el track */
+        }
+
         /* Contenido principal */
         .main-content {
             flex-grow: 1;
