@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit();
 }
+
     */
 // Incluir el archivo de conexión
 require_once '../db/conexion.php';

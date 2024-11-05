@@ -1,3 +1,11 @@
+<?php
+//Iniciar la sesión y verificar si el usuario está logueado
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -27,12 +35,42 @@ body {
     width: 280px;
     background-color: #2c3e50;
     color: white;
-    height: 100vh;
+    height: calc(100vh - 60px); /* Ajusta la altura si tienes una cabecera de 60px */
     position: fixed;
     left: 0;
     top: 0;
     padding-top: 2rem;
     transition: all 0.3s ease;
+    /* Si deseas que la barra lateral no tenga borde en el contenido, puedes usar */
+    border-right: 1px solid rgba(255, 255, 255, 0.1); /* Borde derecho opcional */
+}
+/* Estilos de la barra de desplazamiento para navegadores WebKit (Chrome, Safari) */
+.sidebar::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #34495e; /* Color de fondo del track */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #60a5fa; /* Color de la barra de desplazamiento */
+    border-radius: 50%; /* Bordes redondeados */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #007bff; /* Color cuando se pasa el mouse */
+}
+
+/* Estilos de la barra de desplazamiento para Firefox */
+.sidebar {
+    scrollbar-width: thin; /* Ancho de la barra de desplazamiento */
+    scrollbar-color: #60a5fa #34495e; /* Color de la barra y el track */
+}
+
+/* Estilos para navegadores que no soportan barra de desplazamiento personalizada */
+.sidebar {
+    overflow-y: auto; /* Permitir desplazamiento vertical */
 }
 
 .sidebar h1 {
@@ -262,6 +300,27 @@ body {
         -webkit-overflow-scrolling: touch;
     }
 }
+.user-profile {
+    text-align: center;
+    margin-bottom: 20px; /* Espacio entre la foto y la navegación */
+}
+
+.profile-img {
+    width: 60px; /* Ajusta según tu diseño */
+    height: 60px; /* Ajusta según tu diseño */
+    border-radius: 50%; /* Hace que la imagen sea circular */
+}
+
+.user-name {
+    font-weight: bold;
+    margin: 5px 0; /* Espaciado entre el nombre y el icono */
+}
+
+.logout-icon img {
+    width: 20px; /* Ajusta según tu diseño */
+    height: 20px; /* Ajusta según tu diseño */
+}
+
 
     </style>
 </head>

@@ -1,0 +1,250 @@
+/* Estilos globales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Ajustes para que el contenedor pueda crecer dinámicamente */
+.container {
+    display: flex;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 80%;
+    max-width: 1000px;
+    height: auto; /* Cambia de altura fija a automática */
+    min-height: 600px; /* Mínimo para asegurar buena visualización */
+}
+
+/* Si el contenido es más largo, habilitar el scroll */
+.form-container {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Habilitar desplazamiento vertical si es necesario */
+    max-height: 100vh; /* Limitar la altura para evitar que el formulario crezca demasiado */
+}
+
+/* Contenido del formulario */
+.form-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenedor de imagen */
+.image-container {
+    flex: 1;
+    background-image: url('../../Home/images/perfume.png'); /* Cambia 'your-image-url.jpg' por la URL correcta */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Estilo del logo */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 2rem;
+    animation: fadeIn 1s ease-out 0.5s both;
+    border-radius: 15%;
+}
+
+/* Estilos de encabezados */
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Grupo de entrada */
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+    background-color: #f0f8ff;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Botón de inicio de sesión */
+.sign-in-btn {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sign-in-btn:hover {
+    background-color: #2980b9;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Enlaces */
+.switch-form, .forgot-password {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.switch-form a, .forgot-password a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.switch-form a:hover, .forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos del modal */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Posicionarlo sobre todo */
+    z-index: 100; /* Estar sobre todo el contenido */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho total de la pantalla */
+    height: 100%; /* Alto total de la pantalla */
+    background-color: rgba(0,0,0,0.7); /* Fondo semitransparente */
+    backdrop-filter: blur(5px); /* Desenfoque de fondo */
+    overflow: auto; /* Habilitar desplazamiento si es necesario */
+}
+
+/* Contenido del modal */
+.modal-content {
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes redondeados */
+    margin: 10% auto; /* Centrarlo verticalmente */
+    padding: 30px; /* Espaciado interno */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra para el modal */
+    width: 90%; /* Ancho del modal */
+    max-width: 400px; /* Máximo ancho */
+}
+
+/* Estilo del encabezado del modal */
+.modal-content h2 {
+    text-align: center; /* Centrar texto */
+    color: #34495e; /* Color del encabezado */
+    margin-bottom: 20px; /* Espaciado inferior */
+}
+
+/* Estilo para los campos del modal */
+.modal-content label {
+    display: block; /* Hacer etiquetas en bloque */
+    margin-bottom: 8px; /* Espaciado inferior */
+    color: #7f8c8d; /* Color de las etiquetas */
+}
+
+/* Estilo de entrada en el modal */
+.modal-content input[type="text"],
+.modal-content input[type="email"] {
+    width: calc(100% - 20px); /* 100% menos márgenes */
+    padding: 10px; /* Espaciado interno */
+    border: 1px solid #bdc3c7; /* Borde gris */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de fuente */
+    margin-bottom: 20px; /* Espaciado inferior */
+}
+
+/* Estilo del botón de verificación */
+.modal-content button {
+    background-color: #3498db; /* Color de fondo */
+    color: #fff; /* Color del texto */
+    border: none; /* Sin borde */
+    padding: 12px; /* Espaciado interno */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de fuente */
+    cursor: pointer; /* Cambiar cursor al pasar */
+    transition: background-color 0.3s; /* Transición suave */
+    width: 100%; /* Botón ocupa el ancho total */
+}
+
+.modal-content button:hover {
+    background-color: #2980b9; /* Color al pasar el ratón */
+}
+
+/* Estilo para el botón de cerrar */
+.close {
+    color: #aaa; /* Color por defecto */
+    float: right; /* Alinear a la derecha */
+    font-size: 28px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+}
+
+.close:hover, .close:focus {
+    color: #e74c3c; /* Color al pasar el ratón */
+    text-decoration: none; /* Sin subrayado */
+    cursor: pointer; /* Cambiar cursor al pasar */
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        width: 90%;
+        margin: 20px;
+    }
+    
+    .image-container {
+        display: none;
+    }
+    
+    .form-container {
+        padding: 20px;
+    }
+    
+    h1, h2 {
+        font-size: 20px;
+    }
+    
+    .sign-in-btn {
+        padding: 10px;
+    }
+}
