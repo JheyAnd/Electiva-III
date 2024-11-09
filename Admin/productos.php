@@ -118,7 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Error al editar el producto: " . $conexion->error;
         }
     } else {
-        // Agregar nuevo producto
+            // Generar un NIT aleatorio de 9 dígitos
+        $nit = str_pad(mt_rand(0, 999999999), 9, '0', STR_PAD_LEFT); // Relleno de ceros a la izquierda si es necesario
+
         // Construir la parte de imágenes del query dinámicamente
         $imagenesValues = [];
         for ($i = 1; $i <= 5; $i++) {
@@ -131,12 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             nombre, descripcion, proveedor_id, fragancia_id, marca, 
             tipo_fragancia, tamaño, cantidad, precio_x1, descuento_x1, 
             imagen1, imagen2, imagen3, imagen4, imagen5, 
-            fecha_creacion, fecha_actualizacion, categoria_id
+            fecha_creacion, fecha_actualizacion, categoria_id, nit
         ) VALUES (
             '$nombre', '$descripcion', $proveedor_id, $fragancia_id, '$marca',
             '$tipo_fragancia_nombre', '$tamaño', $cantidad, $precio_x1, $descuento_x1,
             $imagenesValuesStr,
-            NOW(), NOW(), $categoria_id
+            NOW(), NOW(), $categoria_id, '$nit'
         )";
 
         if ($conexion->query($insertSql) === TRUE) {
@@ -145,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "Error al insertar el producto: " . $conexion->error;
         }
+
     }
 }
 
@@ -572,17 +575,7 @@ window.onclick = function(event) {
                 console.log('Página seleccionada:', e.target.textContent);
             }
         });
-        document.addEventListener('DOMContentLoaded', () => {
-        // Selecciona el enlace que despliega el submenú
-        const dropdownToggle = document.querySelector('.dropdown-toggle');
-        const dropdownMenu = document.querySelector('.dropdown');
-
-        // Agrega el evento de clic para alternar la clase 'show'
-        dropdownToggle.addEventListener('click', (event) => {
-            event.preventDefault(); // Evita que el enlace se active
-            dropdownMenu.classList.toggle('show');
-        });
-    });
+       
     tinymce.init({
     selector: '#editor',
     plugins: [
@@ -605,7 +598,8 @@ window.onclick = function(event) {
         });
     }
 });
-    </script>
-    <script src="products.js"></script>
+    
+</script>
+<script src="products.js"></script>
 </body>
 </html>

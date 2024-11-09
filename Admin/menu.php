@@ -33,7 +33,41 @@ $nombre_usuario = $_SESSION['nombre'] ?? 'Admin'; // Asigna un nombre predetermi
                 </ul>
             </li>
             
-            <li><a href="configuracion.php">Configuración</a></li>
+            <li>
+                <a href="#" class="dropdown-toggle"><span class="arrow">▶</span> Configuración</a>
+                <ul class="dropdown">
+                    <li><a href="clientes.php">Clientes</a></li>
+                    <li><a href="contenido_paginas.php">Contenido Páginas</a></li>
+                    <li><a href="transacciones.php">Transacciones</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
 </aside>
+
+<script>
+    // Alternar submenús
+    document.querySelectorAll('.dropdown-toggle').forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            // Cerrar otros submenús
+            document.querySelectorAll('.dropdown-toggle').forEach(function (otherToggle) {
+                if (otherToggle !== toggle) {
+                    otherToggle.classList.remove('active');
+                    otherToggle.nextElementSibling.style.display = 'none';
+                }
+            });
+
+            // Alternar el submenú actual
+            const dropdown = toggle.nextElementSibling;
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                toggle.classList.remove('active');
+            } else {
+                dropdown.style.display = 'block';
+                toggle.classList.add('active');
+            }
+        });
+    });
+</script>

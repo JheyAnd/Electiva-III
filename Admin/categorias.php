@@ -490,17 +490,8 @@ if (isset($_GET['delete'])) {
                 closeModal();
             }
         }
-        document.addEventListener('DOMContentLoaded', () => {
-        // Selecciona el enlace que despliega el submenú
-        const dropdownToggle = document.querySelector('.dropdown-toggle');
-        const dropdownMenu = document.querySelector('.dropdown');
-
-        // Agrega el evento de clic para alternar la clase 'show'
-        dropdownToggle.addEventListener('click', (event) => {
-            event.preventDefault(); // Evita que el enlace se active
-            dropdownMenu.classList.toggle('show');
-        });
-    });
+       
+    
     </script>
 </body>
 </html>
