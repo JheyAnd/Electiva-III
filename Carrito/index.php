@@ -1,443 +1,318 @@
+<?php  
+session_start();
+
+include ("../db/conexion.php");
+
+// Verifica si el carrito existe y si se ha pasado un ID de producto
+if (isset($_SESSION['carrito'])) {
+    if (isset($_GET['id'])) {
+        $arreglo = $_SESSION['carrito'];
+        $encontro = false;
+        $numero = 0;
+        
+        // Recorre el carrito para encontrar el producto
+        for ($i = 0; $i < count($arreglo); $i++) {
+            if ($arreglo[$i]['Id'] == $_GET['id']) {
+                $encontro = true;
+                $numero = $i;
+            }
+        }
+
+        if ($encontro) {
+            // Verifica si se pasó el parámetro 'accion=incrementar' en la URL
+            if (isset($_GET['accion']) && $_GET['accion'] == 'incrementar') {
+                // Incrementa la cantidad solo si se pide explícitamente
+                $arreglo[$numero]['Cantidad'] += 1;
+                $_SESSION['carrito'] = $arreglo;
+            }
+        } else {
+            // Producto nuevo en el carrito
+            $nombre = '';
+            $precio = 0;
+            $imagen = '';
+            $res = $conexion->query("SELECT * FROM productos WHERE id = ".$_GET['id']) or die($conexion->error);
+            $fila = mysqli_fetch_row($res);
+            $nombre = $fila[1];
+            $precio = $fila[9];
+            $imagen = $fila[12];
+
+            $arregloNuevo = array(
+                'Id' => $_GET['id'],
+                'Nombre' => $nombre,
+                'Precio' => $precio,
+                'Imagen' => $imagen,
+                'Cantidad' => 1
+            );
+
+            array_push($arreglo, $arregloNuevo);
+            $_SESSION['carrito'] = $arreglo;
+        }
+    }
+} else {
+    if (isset($_GET['id'])) {
+        $nombre = '';
+        $precio = 0;
+        $imagen = '';
+        $res = $conexion->query("SELECT * FROM productos WHERE id = ".$_GET['id']) or die($conexion->error);
+        $fila = mysqli_fetch_row($res);
+        $nombre = $fila[1];
+        $precio = $fila[9];
+        $imagen = $fila[12];
+        
+        $arreglo[] = array(
+            'Id' => $_GET['id'],
+            'Nombre' => $nombre,
+            'Precio' => $precio,
+            'Imagen' => $imagen,
+            'Cantidad' => 1
+        );
+        
+        $_SESSION['carrito'] = $arreglo;
+    }
+}
+?>
+
+
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras Interactivo</title>
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
+<html lang="en">
+  <head>
+    <title>Tienda </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        /* Estilos del carrito */
-        .cart {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .cart-items {
-            flex: 2;
-            min-width: 300px;
-        }
-        .cart-summary {
-            flex: 1;
-            min-width: 250px;
-        }
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
 
-        /* Estilos de los productos */
-        .product {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .product img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .product-info {
-            flex-grow: 1;
-            margin-left: 20px;
-        }
-        .product-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .product-price {
-            color: #e74c3c;
-        }
-        .product-quantity {
-            display: flex;
-            align-items: center;
-        }
-        .quantity-btn {
-            background-color: #ecf0f1;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
-        .quantity-btn:hover {
-            background-color: #bdc3c7;
-        }
-        .quantity {
-            margin: 0 10px;
-        }
-        .remove-btn {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .remove-btn:hover {
-            background-color: #c0392b;
-        }
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
 
-        /* Estilos del resumen */
-        .summary {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .summary-total {
-            font-weight: bold;
-            font-size: 1.2em;
-            border-top: 1px solid #ecf0f1;
-            padding-top: 10px;
-        }
-        .promo-code {
-            display: flex;
-            margin-top: 20px;
-        }
-        .promo-code input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px 0 0 4px;
-        }
-        .promo-code button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .promo-code button:hover {
-            background-color: #2980b9;
-        }
-        .action-buttons {
-            margin-top: 20px;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            margin-bottom: 10px;
-        }
-        .btn-primary {
-            background-color: #2ecc71;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #27ae60;
-        }
-        .btn-secondary {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-        }
-        .btn-secondary:hover {
-            background-color: #bdc3c7;
-        }
 
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .checkmark {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: block;
-            stroke-width: 2;
-            stroke: #2ecc71;
-            stroke-miterlimit: 10;
-            margin: 10% auto;
-            box-shadow: inset 0px 0px 0px #2ecc71;
-            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
-        }
-        .checkmark__circle {
-            stroke-dasharray: 166;
-            stroke-dashoffset: 166;
-            stroke-width: 2;
-            stroke-miterlimit: 10;
-            stroke: #2ecc71;
-            fill: none;
-            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-        }
-        .checkmark__check {
-            transform-origin: 50% 50%;
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-        }
-        @keyframes stroke {
-            100% {
-                stroke-dashoffset: 0;
-            }
-        }
-        @keyframes scale {
-            0%, 100% {
-                transform: none;
-            }
-            50% {
-                transform: scale3d(1.1, 1.1, 1);
-            }
-        }
-        @keyframes fill {
-            100% {
-                box-shadow: inset 0px 0px 0px 30px #2ecc71;
-            }
-        }
+    <link rel="stylesheet" href="css/aos.css">
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .cart {
-                flex-direction: column;
-            }
-            .cart-items, .cart-summary {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Tu Carrito de Compras</h1>
-        <div class="cart">
-            <div class="cart-items">
-                <div class="product" data-price="100000">
-                    <img src="/placeholder.svg" alt="Perfume A">
-                    <div class="product-info">
-                        <div class="product-title">Perfume A</div>
-                        <div class="product-price">COP 100,000</div>
-                    </div>
-                    <div class="product-quantity">
-                        <button class="quantity-btn minus">-</button>
-                        <span class="quantity">1</span>
-                        <button class="quantity-btn plus">+</button>
-                    </div>
-                    <button class="remove-btn">Eliminar</button>
-                </div>
-                <div class="product" data-price="150000">
-                    <img src="/placeholder.svg" alt="Perfume B">
-                    <div class="product-info">
-                        <div class="product-title">Perfume B</div>
-                        <div class="product-price">COP 150,000</div>
-                    </div>
-                    <div class="product-quantity">
-                        <button class="quantity-btn minus">-</button>
-                        <span class="quantity">2</span>
-                        <button class="quantity-btn plus">+</button>
-                    </div>
-                    <button class="remove-btn">Eliminar</button>
-                </div>
-                <div class="product" data-price="200000">
-                    <img src="/placeholder.svg" alt="Perfume C">
-                    <div class="product-info">
-                        <div class="product-title">Perfume C</div>
-                        <div class="product-price">COP 200,000</div>
-                    </div>
-                    <div class="product-quantity">
-                        <button class="quantity-btn minus">-</button>
-                        <span class="quantity">1</span>
-                        <button class="quantity-btn plus">+</button>
-                    </div>
-                    <button class="remove-btn">Eliminar</button>
-                </div>
+    <link rel="stylesheet" href="css/styles.css">
+    
+  </head>
+  <body>
+  
+  <div class="site-wrap">
+  <?php include("./layouts/header.php"); ?> 
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row mb-5">
+          <form class="col-md-12" method="post">
+            <div class="site-blocks-table">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="product-thumbnail">Image</th>
+                    <th class="product-name">Product</th>
+                    <th class="product-price">Price</th>
+                    <th class="product-quantity">Quantity</th>
+                    <th class="product-total">Total</th>
+                    <th class="product-remove">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $total = 0;
+                        if(isset($_SESSION['carrito'])){
+
+                            $arregloCarrito = $_SESSION['carrito'];
+                            for($i = 0; $i<count($arregloCarrito);$i++){
+                                $total = $total + ($arregloCarrito[$i]['Precio']*$arregloCarrito[$i]['Cantidad']);
+                            ?>
+                        
+                  <tr>
+                    <td class="product-thumbnail">
+                      <img src="../Admin/<?php echo $arregloCarrito[$i]['Imagen'];?>" alt="Image" class="img-fluid">
+                    </td>
+                    <td class="product-name">
+                      <h2 class="h5 text-black"><?php echo $arregloCarrito[$i]['Nombre'];?></h2>
+                    </td>
+                    <td><?php echo number_format($arregloCarrito[$i]['Precio'], 2); ?></td>
+                    <td>
+                      <div class="input-group mb-3" style="max-width: 120px;">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-primary js-btn-minus btnIncrementar"  type="button">&minus;</button>
+                        </div>
+                        <input type="text" class="form-control text-center txtCantidad btnIncrementar"
+                        data-precio="<?php echo $arregloCarrito[$i]['Precio'];?>"
+                        data-id="<?php echo $arregloCarrito[$i]['Id'];?>" 
+                        value="<?php echo $arregloCarrito[$i]['Cantidad'];?>" 
+                        placeholder="" aria-label="Example text with button addon" 
+                        aria-describedby="button-addon1">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-primary js-btn-plus btnIncrementar" type="button">&plus;</button>
+                        </div>
+                      </div>
+
+                    </td>
+                    <td class="canti<?php echo $arregloCarrito[$i]['Id'];?>">
+                        $<?php echo number_format($arregloCarrito[$i]['Precio']*$arregloCarrito[$i]['Cantidad'],2);?></td>
+                    <td><a href="#" class="btn btn-primary btn-sm btnEliminar" data-id= "<?php echo $arregloCarrito[$i]['Id'] ?>">X</a></td>
+                  </tr>
+                  <?php }} ?>
+                </tbody>
+              </table>
             </div>
-            <div class="cart-summary">
-                <div class="summary">
-                    <h2>Resumen del Pedido</h2>
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="subtotal">COP 600,000</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Descuento del producto</span>
-                        <span id="product-discount">COP 0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>IVA (19%)</span>
-                        <span id="iva">COP 114,000</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Descuento promocional</span>
-                        <span id="promo-discount">COP 0</span>
-                    </div>
-                    <div class="summary-row summary-total">
-                        <span>Total a pagar</span>
-                        <span id="total">COP 714,000</span>
-                    </div>
-                    <div class="promo-code">
-                        <input type="text" id="promo-code-input" placeholder="Código promocional">
-                        <button id="apply-promo">Aplicar</button>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" id="pay-btn">Pagar</button>
-                        <button class="btn btn-secondary">Seguir Comprando</button>
-                    </div>
-                </div>
-            </div>
+          </form>
         </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mb-5">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <button class="btn btn-primary btn-sm btn-block">Update Cart</button>
+              </div>
+              <div class="col-md-6">
+                <button class="btn btn-outline-primary btn-sm btn-block">Continue Shopping</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-black h4" for="coupon">Coupon</label>
+                <p>Enter your coupon code if you have one.</p>
+              </div>
+              <div class="col-md-8 mb-3 mb-md-0">
+                <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-primary btn-sm">Apply Coupon</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 pl-5">
+            <div class="row justify-content-end">
+              <div class="col-md-7">
+                <div class="row">
+                  <div class="col-md-12 text-right border-bottom mb-5">
+                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                  </div>
+                </div>
+                <div class="row mb-3">
+    <div class="col-md-6">
+        <span class="text-black">Subtotal</span>
+    </div>
+    <div class="col-md-6 text-right">
+        <strong class="text-black subtotal"><?php echo number_format($total, 2); ?></strong>
+    </div>
+    <div class="col-md-6">
+        <span class="text-black">IVA % 19</span>
+    </div>
+    <div class="col-md-6 text-right">
+        <strong class="text-black iva"><?php echo number_format($iva = ($total * 0.19), 2); ?></strong>
+    </div>
+</div>
+<div class="row mb-5">
+    <div class="col-md-6">
+        <span class="text-black">Total</span>
+    </div>
+    <div class="col-md-6 text-right">
+        <strong class="text-black total"><?php echo number_format(($iva + $total), 2); ?></strong>
+    </div>
+</div>
+
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <button class="btn btn-primary btn-lg py-3 btn-block" onclick="window.location='checkout.php'">Proceed To Checkout</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Modal -->
-    <div id="paymentModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-            <h2>¡Pago Exitoso!</h2>
-            <p>Tu pedido ha sido procesado correctamente.</p>
-        </div>
-    </div>
+    <?php include("./layouts/footer.php"); ?> 
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cart = document.querySelector('.cart-items');
-            const subtotalEl = document.getElementById('subtotal');
-            const ivaEl = document.getElementById('iva');
-            const totalEl = document.getElementById('total');
-            const promoCodeInput = document.getElementById('promo-code-input');
-            const applyPromoBtn = document.getElementById('apply-promo');
-            const promoDiscountEl = document.getElementById('promo-discount');
-            const payBtn = document.getElementById('pay-btn');
-            const modal = document.getElementById('paymentModal');
-            const closeBtn = document.querySelector('.close');
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
 
-            function updateTotals() {
-                let subtotal = 0;
-                cart.querySelectorAll('.product').forEach(product => {
-                    const price = parseInt(product.dataset.price);
-                    const quantity = parseInt(product.querySelector('.quantity').textContent);
-                    subtotal += price * quantity;
-                });
-
-                const iva = subtotal * 0.19;
-                const total = subtotal + iva;
-
-                subtotalEl.textContent = `COP ${subtotal.toLocaleString()}`;
-                ivaEl.textContent = `COP ${iva.toLocaleString()}`;
-                totalEl.textContent = `COP ${total.toLocaleString()}`;
-            }
-
-            cart.addEventListener('click', function(e) {
-                if (e.target.classList.contains('quantity-btn')) {
-                    const product = e.target.closest('.product');
-                    const quantityEl = product.querySelector('.quantity');
-                    let quantity = parseInt(quantityEl.textContent);
-
-                    if (e.target.classList.contains('plus')) {
-                        quantity++;
-                    } else if  (e.target.classList.contains('minus')) {
-                        quantity = Math.max(1, quantity - 1);
-                    }
-
-                    quantityEl.textContent = quantity;
-                    updateTotals();
-                } else if (e.target.classList.contains('remove-btn')) {
-                    e.target.closest('.product').remove();
-                    updateTotals();
-                }
-            });
-
-            applyPromoBtn.addEventListener('click', function() {
-                const promoCode = promoCodeInput.value.trim().toUpperCase();
-                if (promoCode === 'DESCUENTO20') {
-                    const subtotal = parseInt(subtotalEl.textContent.replace(/[^0-9]/g, ''));
-                    const discount = subtotal * 0.2;
-                    promoDiscountEl.textContent = `COP ${discount.toLocaleString()}`;
-                    updateTotals();
-                } else {
-                    alert('Código promocional inválido');
-                }
-            });
-
-            payBtn.addEventListener('click', function() {
-                modal.style.display = 'block';
-            });
-
-            closeBtn.addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', function(event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-            updateTotals();
+  <script src="js/main.js"></script>
+  <script>
+   $(document).ready(function(){
+    // Eliminar producto del carrito
+    $(".btnEliminar").click(function(event){
+        event.preventDefault();
+        var id = $(this).data('id');
+        var boton = $(this);
+        $.ajax({
+            method : 'post',
+            url: 'eliminarCarrito.php',
+            data: { id: id }
+        }).done(function(respuesta){
+            alert(respuesta)
+            boton.parent('td').parent('tr').remove();
+            actualizarCarrito(); // Actualizar carrito después de eliminar producto
         });
-    </script>
-</body>
+    });
+
+    // Incrementar o disminuir la cantidad
+    $(".btnIncrementar").click(function(){
+        var inputCantidad = $(this).parent('div').parent('div').find('input');
+        var precio = inputCantidad.data('precio');
+        var id = inputCantidad.data('id');
+        var cantidad = parseInt(inputCantidad.val());
+
+        // Verificar si es decrementar o incrementar
+        if ($(this).hasClass('js-btn-plus')) {
+            cantidad += 1;
+        } else if ($(this).hasClass('js-btn-minus') && cantidad > 1) {
+            cantidad -= 1;
+        }
+
+        inputCantidad.val(cantidad); // Actualiza el input de cantidad
+        actualizarCarritoProducto(cantidad, precio, id); // Llamar función para actualizar carrito
+    });
+
+    // Función para actualizar el producto en el carrito
+    function actualizarCarritoProducto(cantidad, precio, id) {
+        var mult = cantidad * precio;
+        $(".canti" + id).text("$" + mult.toFixed(2)); // Actualiza el subtotal de ese producto
+
+        $.ajax({
+            method: 'post',
+            url: 'actualizarCarrito.php',
+            data: { id: id, cantidad: cantidad }
+        }).done(function(respuesta) {
+            var resultado = JSON.parse(respuesta);
+
+            // Actualiza los valores del subtotal, IVA y total
+            $(".subtotal").text("$" + resultado.subtotal.toFixed(2));
+            $(".iva").text("$" + resultado.iva.toFixed(2));
+            $(".total").text("$" + resultado.total.toFixed(2));
+        });
+    }
+
+    // Función para actualizar todo el carrito
+    function actualizarCarrito() {
+        $.ajax({
+            method: 'post',
+            url: 'actualizarCarrito.php', // Asumiendo que 'actualizarCarrito.php' también maneja la actualización completa
+            data: {} // Sin parámetros adicionales, solo actualizamos el carrito
+        }).done(function(respuesta) {
+            var resultado = JSON.parse(respuesta);
+
+            $(".subtotal").text("$" + resultado.subtotal.toFixed(2));
+            $(".iva").text("$" + resultado.iva.toFixed(2));
+            $(".total").text("$" + resultado.total.toFixed(2));
+        });
+    }
+});
+
+  </script>
+    
+  </body>
 </html>

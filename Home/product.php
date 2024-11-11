@@ -1,3 +1,27 @@
+
+<?php  
+include ("../db/conexion.php");
+
+if (isset($_GET['id']) || isset($_GET['nit'])) {
+    // Si 'id' existe, lo utiliza; si no, asume que 'nit' existe
+    $campo = isset($_GET['id']) ? 'id' : 'nit';
+    $valor = isset($_GET['id']) ? $_GET['id'] : $_GET['nit'];
+
+    $resultado = $conexion->query("SELECT * FROM productos WHERE $campo = $valor") or die($conexion->error);
+
+    if (mysqli_num_rows($resultado) > 0) {
+        $fila = mysqli_fetch_row($resultado);
+    } else {
+        header("Location: index.php");
+        exit;
+    }
+} else {
+    header("Location: index.php");
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -478,7 +502,7 @@
 				<div class="col-md-5 col-md-push-2">
 					<div id="product-main-img">
 						<div class="product-preview">
-							<img src="./images/products/unisex/1-1.png" alt="">
+							<img src="../Admin/<?php echo $fila[11];?>" alt="">
 						</div>
 					</div>
 				</div>
@@ -488,15 +512,15 @@
 				<div class="col-md-2  col-md-pull-5">
 					<div id="product-imgs">
 						<div class="product-preview">
-							<img src="./images/products/unisex/1-1.png" alt="">
+							<img src="../Admin/<?php echo $fila[12];?>" alt="">
 						</div>
 
 						<div class="product-preview">
-							<img src="./images/products/unisex/1-1.png" alt="">
+							<img src="../Admin/<?php echo $fila[13];?>" alt="">
 						</div>
 
 						<div class="product-preview">
-							<img src="./images/products/unisex/1-1.png" alt="">
+							<img src="../Admin/<?php echo $fila[14];?>" alt="">
 						</div>
 
 						<div class="product-preview">
@@ -509,7 +533,7 @@
 				<!-- Product details -->
 				<div class="col-md-5">
 					<div class="product-details">
-						<h2 class="product-name">Nombre de la Colonia</h2>
+						<h2 class="product-name"><?php echo $fila[1];?></h2>
 						<div>
 							<div class="product-rating">
 								<i class="fa fa-star"></i>
@@ -521,31 +545,30 @@
 							<a class="review-link" href="#">Reseña(s) | Dejar reseña</a>
 						</div>
 						<div>
-							<h3 class="product-price">$105.000 <del class="product-old-price">$130.000</del></h3>
+							<h3 class="product-price"><?php echo $fila[9];?></h3>
 							<span class="product-available">Disponible</span>
 						</div>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+						<p><?php echo $fila[2];?></p>
 
 						<div class="product-options">
 							<label>
 								Tamaño
 								<select class="input-select">
-									<option value="0">X</option>
+									<option value="<?php echo $fila[7];?>"><?php echo $fila[7];?></option>
 								</select>
 							</label>
 							<label>
 								Cant.
-								<select class="input-select">
-									<option value="0">1</option>
-									<option value="0">2</option>
-									<option value="0">3</option>
-								</select>
+								<input type="number" name="cantidad" id="">
 							</label>
 						</div>
 
 						<div class="add-to-cart">
-							<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Añadir al carro</button>
+							<button class="add-to-cart-btn" data-id="<?php echo $fila[0];?>">
+								<i class="fa fa-shopping-cart"></i>Añadir al Carrito
+							</button>
 						</div>
+
 
 						<ul class="product-btns">
 							<li><a href="#"><i class="fa fa-heart-o"></i> Añadir a favoritos</a></li>
@@ -1271,7 +1294,7 @@
 				</div>
 			</div>
 		</div>
-
+		
 		<!-- footer section starts  -->
 
 		<div class="footer_bottom">
@@ -1315,6 +1338,16 @@
 	<script src="js/nouislider.min.js"></script>
 	<script src="js/jquery.zoom.min.js"></script>
 	<script src="js/main.js"></script>
+	<script>
+		document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.getAttribute('data-id');
+        // Redirige a otra página pasando el id como parámetro en la URL
+        window.location.href = `../Carrito/index.php?id=${<?php echo $fila[0];?>}`;
+    	});
+	});
+
+	</script>
 
 </body>
 

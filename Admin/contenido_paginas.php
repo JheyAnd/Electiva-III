@@ -160,8 +160,8 @@
                     <label for="pagePart">Parte de la Página:</label>
                     <select id="pagePart" name="pagePart" required>
                         <option value="">Seleccionar...</option>
-                        <option value="Hot Dells">Hot Deals</option>
-                        <option value="Best Sells">Best Sellers</option>
+                        <option value="Hot Deals">Hot Deals</option>
+                        <option value="Best Sellers">Best Sellers</option>
                         <option value="On Sale">On Sale</option>
                     </select>
                 </div>
