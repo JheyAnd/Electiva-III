@@ -11,16 +11,15 @@ if (isset($_SESSION['user'])) {
     // Ejemplo: obtener el nombre y correo del usuario
     $nombre = $userData['name'];  // El nombre del usuario (lo obtienes al autenticarse)
     $correo = $userData['email']; // El correo del usuario (también al autenticarse)
-} else {
-    // Si no hay sesión activa, redirigir al usuario a la página de inicio de sesión
-    if (isset($_SESSION['usuario'])){
-
-    $correo = $_SESSION['usuario'];
-
-    }else{
-        header("Location : login.php");
-    }
 }
+if (isset($_SESSION['usuario'])) {
+    // Obtener los datos del usuario almacenados en la sesión
+
+    // Ejemplo: obtener el nombre y correo del usuario
+    // El nombre del usuario (lo obtienes al autenticarse)
+    $correo = $_SESSION['usuario']; // El correo del usuario (también al autenticarse)
+}
+
 
 // Consulta para obtener todas las categorías
 $consultaCategorias = "SELECT id, nombre FROM categorias";

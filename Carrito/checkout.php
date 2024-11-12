@@ -1,11 +1,11 @@
 <?php
 session_start();
-
+require __DIR__ . '/../vendor/autoload.php';
 if(!isset($_SESSION['carrito'])){
   header('Location: ../Home/index.php');
 }
 $arreglo = $_SESSION['carrito'];
-require __DIR__ . '/../vendor/autoload.php';
+
 
 use MercadoPago\SDK;
 use MercadoPago\Preference;
