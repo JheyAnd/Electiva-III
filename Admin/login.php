@@ -1,5 +1,5 @@
 <?php
-session_start(); // Se agregó el punto y coma
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,16 +7,16 @@ session_start(); // Se agregó el punto y coma
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Portal</title>
-    <link rel="stylesheet" href="css/style.css"> <!-- Asegúrate de que el archivo CSS esté bien enlazado -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Añadido jQuery -->
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="form-container">
             <div class="logo">
-                <img src="../Home/images/logo.png" alt="Logo" class="logo-img"> <!-- Cambia por la ruta correcta -->
+                <img src="../Home/images/logo.png" alt="Logo" class="logo-img">
             </div>
-            
+
             <!-- Login Form -->
             <div id="login-form" class="form-content">
                 <h1>Welcome Back Admin</h1>
@@ -81,7 +81,7 @@ session_start(); // Se agregó el punto y coma
             <form id="verificationForm" method="post" action="verificar_codigo.php">
                 <label for="codigo">Ingrese su código de verificación</label>
                 <input type="text" id="codigo" name="codigo" required>
-                <input type="hidden" name="correo" id="correo" id="hiddenCorreo">
+                <input type="hidden" name="correo" id="hiddenCorreo">
                 <button type="submit">Verificar</button>
             </form>
         </div>
@@ -98,7 +98,6 @@ session_start(); // Se agregó el punto y coma
     </div>
 
     <script>
-        // Alternar entre el formulario de login y registro
         document.getElementById('show-register').addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('login-form').style.display = 'none';
@@ -117,17 +116,13 @@ session_start(); // Se agregó el punto y coma
             const password = document.getElementById('reg-password').value;
             const forbiddenWords = ["admin", "administrador"];
 
-            // Validación de contraseña
             if (!validatePassword(password, forbiddenWords)) {
                 showErrorModal("La contraseña debe tener al menos 8 caracteres, incluir letras, números y caracteres especiales, y no puede contener palabras como 'admin' o 'administrador'.");
                 return;
             }
-
-            // Continuar con el envío si la contraseña es válida
             submitForm(this);
         });
 
-        // Validación de la contraseña
         function validatePassword(password, forbiddenWords) {
             return password.length >= 8 && 
                    /[a-zA-Z]/.test(password) && 
@@ -136,9 +131,8 @@ session_start(); // Se agregó el punto y coma
                    !forbiddenWords.some(word => password.toLowerCase().includes(word));
         }
 
-        // Enviar el formulario usando AJAX
         function submitForm(formElement) {
-            const formData = $(formElement).serialize(); // Serializa los datos del formulario
+            const formData = $(formElement).serialize();
             const action = $(formElement).attr('action');
 
             $.ajax({
@@ -159,55 +153,48 @@ session_start(); // Se agregó el punto y coma
                 }
             });
         }
+
         $('#verificationForm').on('submit', function(e) {
-    e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+            e.preventDefault();
 
-    const codigo = $('#codigo').val();
-    const correo = $('#correo').val(); // Obtener el correo del campo oculto
-    const action = $(this).attr('action'); // Obtener la URL del atributo action del formulario
+            const codigo = $('#codigo').val();
+            const correo = $('#hiddenCorreo').val(); // Cambiado a hiddenCorreo
+            const action = $(this).attr('action');
 
-    $.ajax({
-        type: 'POST',
-        url: action,
-        data: { codigo: codigo, correo: correo }, // Enviar el código y el correo
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                alert(response.message);
-                $('#verificationModal').hide(); // Cerrar el modal
-                window.location.href = 'index.php'; // Redirigir al usuario
-            } else {
-                showErrorModal(response.message); // Mostrar el mensaje de error
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error:', error);
-            showErrorModal("Ocurrió un error al verificar el código. Intenta nuevamente.");
-        }
-    });
-});
+            $.ajax({
+                type: 'POST',
+                url: action,
+                data: { codigo: codigo, correo: correo },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#verificationModal').hide();
+                        window.location.href = 'index.php';
+                    } else {
+                        showErrorModal(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    showErrorModal("Ocurrió un error al verificar el código. Intenta nuevamente.");
+                }
+            });
+        });
 
-
-
-
-
-        // Mostrar el modal de error
         function showErrorModal(message) {
             $('#errorMessage').text(message);
             $('#errorModal').show();
         }
 
-        // Cerrar los modales
         $('.close').on('click', function() {
             $(this).closest('.modal').hide();
         });
 
-        // Cerrar el modal de error al hacer clic en el botón "Cerrar"
         $('#closeErrorModal').on('click', function() {
             $('#errorModal').hide();
         });
 
-        // Cerrar el modal de verificación cuando se hace clic fuera del modal
         $(window).on('click', function(event) {
             if ($(event.target).is('#verificationModal')) {
                 $('#verificationModal').hide();

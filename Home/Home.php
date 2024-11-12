@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dining On The Lake</title>
+    <title>Home - Imperial</title>
     <link rel="stylesheet" href="css/homes.css">
 </head>
 <body>
@@ -38,18 +38,14 @@
     <footer>
         <div class="footer-container">
             <div class="copyright">
-                &copy; 2024 Dining On The Lake. Todos los derechos reservados.
+                &copy; 2024 Imperial Essences. Todos los derechos reservados.
             </div>
             <ul class="footer-links">
                 <li><a href="#privacidad">Política de Privacidad</a></li>
                 <li><a href="#terminos">Términos de Uso</a></li>
                 <li><a href="#contacto">Contacto</a></li>
             </ul>
-            <div class="social-links">
-                <a href="#facebook" aria-label="Facebook">&#xf09a;</a>
-                <a href="#twitter" aria-label="Twitter">&#xf099;</a>
-                <a href="#instagram" aria-label="Instagram">&#xf16d;</a>
-            </div>
+           
         </div>
     </footer>
 </body>

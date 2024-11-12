@@ -1,10 +1,50 @@
 <?php
 session_start();
+
 if(!isset($_SESSION['carrito'])){
   header('Location: ../Home/index.php');
 }
 $arreglo = $_SESSION['carrito'];
+require __DIR__ . '/../vendor/autoload.php';
 
+use MercadoPago\SDK;
+use MercadoPago\Preference;
+use MercadoPago\Item;
+
+// Establecer el access token de Mercado Pago (mejor almacenarlo en una variable de entorno)
+SDK::setAccessToken("APP_USR-2824503991782324-111119-30bd7af095ddc096af10e258df59645d-2089933937");
+
+$preference = new Preference();
+$total = 0;
+$iva = 0;
+$totalNuevo = 0;
+for ($i = 0; $i < count($arreglo); $i++){
+$total = $arreglo[$i]['Precio']*$arreglo[$i]['Cantidad'];
+$iva = $total * 0.19;
+$totalNuevo = $iva + $total;
+$item = new Item();
+$item->title = $arreglo[$i]['Nombre'];
+$item->quantity = $arreglo[$i]['Cantidad'];
+$item->unit_price = $totalNuevo;
+}
+// Agregar los items a la preferencia
+$preference->items = array($item);
+
+try {
+    // Guardar la preferencia
+    $preference->save();
+
+    if (!empty($preference->id)) {
+        $preference_id = $preference->id;
+    } else {
+        throw new Exception("Hubo un problema al crear la preferencia.");
+    }
+} catch (Exception $e) {
+    // Mostrar errores más detallados
+    echo "Error al crear la preferencia: " . $e->getMessage();
+    var_dump($preference); // Puedes revisar qué contiene el objeto $preference
+    $preference_id = null;
+}
 ?>
 
 <!DOCTYPE html>
@@ -25,7 +65,7 @@ $arreglo = $_SESSION['carrito'];
 
 
     <link rel="stylesheet" href="css/aos.css">
-
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     <link rel="stylesheet" href="css/styles.css">
     
   </head>
@@ -175,34 +215,33 @@ $arreglo = $_SESSION['carrito'];
 
                   </table>
 
-                  <div class="border p-3 mb-3">
-                    <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsebank" role="button" aria-expanded="false" aria-controls="collapsebank">Direct Bank Transfer</a></h3>
-
-                    <div class="collapse" id="collapsebank">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
-                  </div>
 
                   <div class="border p-3 mb-3">
                     <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsecheque" role="button" aria-expanded="false" aria-controls="collapsecheque">Cheque Payment</a></h3>
 
-                    <div class="collapse" id="collapsecheque">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
-                  </div>
+                    <?php if ($preference_id): ?>
+        <!-- Contenedor donde se mostrará el brick de Wallet -->
+        <div id="wallet_container"></div>
 
-                  <div class="border p-3 mb-5">
-                    <h3 class="h6 mb-0"><a class="d-block" data-toggle="collapse" href="#collapsepaypal" role="button" aria-expanded="false" aria-controls="collapsepaypal">Paypal</a></h3>
+        <script>
+            // Inicializar Mercado Pago con tu Public Key
+            const mp = new MercadoPago('APP_USR-57551004-1297-4757-b51e-69b58f06dcaa'); // Reemplaza con tu Public Key
 
-                    <div class="collapse" id="collapsepaypal">
-                      <div class="py-2">
-                        <p class="mb-0">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                      </div>
-                    </div>
+            // Crear el brick de Wallet
+            mp.bricks().create("wallet", "wallet_container", {
+                initialization: {
+                    preferenceId: "<?php echo $preference_id; ?>", // El ID de la preferencia generada desde PHP
+                },
+                customization: {
+                    texts: {
+                        valueProp: 'smart_option', // Personaliza el texto que aparece en el brick
+                    },
+                },
+            });
+        </script>
+    <?php else: ?>
+        <p>Hubo un problema al generar la preferencia de pago. Inténtalo más tarde.</p>
+    <?php endif; ?>
                   </div>
 
                   <div class="form-group">

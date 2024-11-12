@@ -1,5 +1,26 @@
 <?php
 include ("../db/conexion.php");
+session_start();
+ // Asegúrate de que la sesión esté iniciada
+
+// Verificar si el usuario está autenticado
+if (isset($_SESSION['user'])) {
+    // Obtener los datos del usuario almacenados en la sesión
+    $userData = $_SESSION['user'];
+
+    // Ejemplo: obtener el nombre y correo del usuario
+    $nombre = $userData['name'];  // El nombre del usuario (lo obtienes al autenticarse)
+    $correo = $userData['email']; // El correo del usuario (también al autenticarse)
+} else {
+    // Si no hay sesión activa, redirigir al usuario a la página de inicio de sesión
+    if (isset($_SESSION['usuario'])){
+
+    $correo = $_SESSION['usuario'];
+
+    }else{
+        header("Location : login.php");
+    }
+}
 
 // Consulta para obtener todas las categorías
 $consultaCategorias = "SELECT id, nombre FROM categorias";
@@ -65,21 +86,6 @@ $conexion->close();
             </div>
             <div class="header_account">
                 <ul>
-                    <li class="language">
-                        <a href="#"><img src="images/icon/language.png" alt="English"> EN <i
-                                class="fa fa-angle-down"></i></a>
-                        <ul class="dropdown_language">
-                            <li><a href="#">Spain</a></li>                            
-                        </ul>
-                    </li>
-                    <li class="currency">
-                        <a href="#">COP <i class="fa fa-angle-down"></i></a>
-                        <ul class="dropdown_currency">
-                            <li><a href="#">US - EEUU </a></li>
-                            
-                            
-                        </ul>
-                    </li>
                     <li class="top_links">
                         <a href="#">My Account <i class="fa fa-angle-down"></i></a>
                         <ul class="dropdown_links">
@@ -117,7 +123,7 @@ $conexion->close();
             <div id="menu" class="text-left">
                 <ul class="offcanvas_main_menu">
                     <li class="menu-item-has-children active">
-                        <a href="#">Home</a>
+                        <a href="home.php">Home</a>
                         <ul class="sub-menu">
                             <li><a href="#">Men</a></li>
                             <li><a href="#">Women</a></li>
@@ -160,31 +166,29 @@ $conexion->close();
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Blog</a>
-                        <ul class="sub-menu">
-                            <li><a href="#">Newsletter</a></li>
-                            <li><a href="#">Social Media</a></li>
-                        </ul>
-                    </li>
+                   
                     <li class="menu-item-has-children">
                         <a href="#">My Account</a>
                     </li>
-                    <li class="menu-item-has-children">
-                        <a href="#">About Us</a>
-                    </li>
+                    
                     <li class="menu-item-has-children">
                         <a href="#">User</a>
                         <ul class="sub-menu">
-                            <li><a href="#">Login In</a></li>
-                            <li><a href="#">Sign up</a></li>
+                            <?php if (!isset($correo)): ?>
+                                <li><a href="login.php">Login In</a></li>
+                            <?php else: ?>
+                                <li><a href="perfil.php">Perfil</a></li>
+                                <li><a href="../Registro&Seccion/cerrar_sesion.php">Cerrar Sesion</a></li>
+                            <?php endif; ?>
                         </ul>
                     </li>
+
+
                 </ul>
             </div>
 
             <div class="offcanvas_footer">
-                <span><a href="#"><i class="fa fa-envelope-0"></i>deo@gmail.com</a></span>
+                <span><a href="#"><i class="fa fa-envelope-0"></i>YJ</a></span>
                 <ul>
                     <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                     <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -215,7 +219,7 @@ $conexion->close();
                                 <nav>
                                     <ul>
                                         <li>
-                                            <a href="index.html" class="active">Home <i
+                                            <a href="home.php" class="active">Home <i
                                                     class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu">
                                                 <li><a href="#">Men</a></li>
@@ -266,21 +270,20 @@ $conexion->close();
                                                 </ul>
                                             </div>
                                         </li>
-                                        <li>
-                                            <a href="#">Blog <i class="fa fa-angle-down"></i></a>
-                                            <ul class="sub_menu pages">
-                                                <li><a href="#">Newsletter</a></li>
-                                                <li><a href="#">Social Media</a></li>
-                                            </ul>
-                                        </li>
+                                        
                                         <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Contact Us</a></li>
                                         <li>
                                             <a href="#">User <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="login.php">Login In</a></li>
-                                                <li><a href="#">Sign Up</a></li>
-                                            </ul>
+                                            <?php if (!isset($correo)): ?>
+                                            <!-- Mostrar solo si el usuario no está logueado -->
+                                            <li><a href="login.php">Login In</a></li>
+                                        <?php else: ?>
+                                            <!-- Mostrar solo si el usuario está logueado -->
+                                            <li><a href="perfil.php">Perfil</a></li>
+                                            <li><a href="../Registro&Seccion/cerrar_sesion.php">Cerrar sesión</a></li>
+                                        <?php endif; ?>
+                                        </ul>
                                         </li>
                                     </ul>
                                 </nav>
@@ -303,12 +306,7 @@ $conexion->close();
                                                 </form>
                                             </div>
                                         </li>
-                                        <li class="header_wishlist">
-                                            <a href="#">
-                                                <i class="fa fa-heart-o"></i>
-                                                <span class="item_count">4</span>
-                                            </a>
-                                        </li>
+                                        
 
                                             <!-- mini cart  -->
                                            
@@ -318,28 +316,13 @@ $conexion->close();
                                     <ul>
                                         <li class="top_links">
                                             <a href="#">
-                                                <i class="fa fa-cog"></i>
+                                                <i class="fa fa-user"></i>
                                             </a>
                                             <ul class="dropdown_links">
                                                 <li><a href="#">Checkout</a></li>
                                                 <li><a href="#">My Account</a></li>
                                                 <li><a href="#">Shopping cart</a></li>
                                                 <li><a href="#">Wishlist</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="language">
-                                            <a href="#"><img src="images/icon/language.png" alt="English"> EN <i
-                                                    class="fa fa-angle-down"></i></a>
-                                            <ul class="dropdown_language">
-                                                <li><a href="#">English</a></li>
-                                                <li><a href="#">Spanish</a></li>
-                                                
-                                            </ul>
-                                        </li>
-                                        <li class="currency">
-                                            <a href="#">COP <i class="fa fa-angle-down"></i></a>
-                                            <ul class="dropdown_currency">
-                                                <li><a href="#">US - EEUU</a></li>
                                             </ul>
                                         </li>
                                     </ul>
@@ -453,21 +436,6 @@ $conexion->close();
                                         <a href="product.php?id=<?php echo $nombreID; ?>" class="secondary_img">
                                             <img src="../Admin/<?php echo $imagen2; ?>" alt="">
                                         </a>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="add_to_cart">
-                                                    <a href="#" title="Add to Cart"><i class="fa fa-shopping-cart"></i></a>
-                                                </li>
-                                                <li class="wishlist">
-                                                    <a href="#" title="Add to Wishlist"><i class="fa fa-heart-o"></i></a>
-                                                </li>
-                                                <li class="quick_button">
-                                                    <a href="#" data-toggle="modal" data-target="#modal_box" title="Quick View">
-                                                        <i class="fa fa-eye"></i>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
                                     </div>
                                     <figcaption class="product_content">
                                         <h4 class="product_name"><a href="product.php?id=<?php echo $nombreID; ?>"><?php echo $nombreProducto;?></a></h4>
@@ -573,18 +541,7 @@ $conexion->close();
                                                             <img src="../Admin/<?php echo $row['imagen2']; ?>" alt="<?php echo $row['nombre']; ?>">
                                                         </a>
                                                         <div class="action_links">
-                                                            <ul>
-                                                                <li class="wishlist">
-                                                                    <a href="#" title="Add to Wishlist">
-                                                                        <i class="fa fa-heart-o"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="quick_button">
-                                                                    <a href="#" data-toggle="modal" data-target="#modal_box" title="Quick View">
-                                                                        <i class="fa fa-eye"></i>
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
+                                                           
                                                         </div>
                                                     </div>
                                                     <figcaption>
@@ -715,14 +672,7 @@ $conexion->close();
                                         <a href="product.php?id=<?php echo $id?>" class="secondary_img">
                                             <img src="../Admin/<?php echo $imagen2; ?>" alt="<?php echo $nombre; ?>">
                                         </a>
-                                        <div class="action_links">
-                                            <ul>
-                                                <li class="add_to_cart"><a href="#" title="Add to Cart"><i class="fa fa-shopping-cart"></i></a></li>
-                                                <li class="wishlist"><a href="#" title="Add to Wishlist"><i class="fa fa-heart-o"></i></a></li>
-                                                <li class="compare"><a href="#" title="Add to Compare"><i class="fa fa-random"></i></a></li>
-                                                <li class="quick_button"><a href="#" data-toggle="modal" data-target="#modal_box" title="Quick View"><i class="fa fa-eye"></i></a></li>
-                                            </ul>
-                                        </div>
+                                        
                                     </div>
                                     <figcaption class="product_content">
                                         <h4 class="product_name"><a href="product.php?id=<?php echo $id?>"><?php echo $nombre; ?></a></h4>
@@ -787,34 +737,13 @@ $conexion->close();
                                                             <figure>
                                                                 <div class="product_thumb">
                                                                     <a href="product.php?nit='.  $row['nit'] .'" class="primary_img">
-                                                                        <img src="' . $row['imagen1'] . '" alt="">
+                                                                        <img src="../Admin/' . $row['imagen1'] . '" alt="">
                                                                     </a>
                                                                     <a href="product.php?nit='.  $row['nit'] .'" class="secondary_img">
-                                                                        <img src="' . $row['imagen2'] . '" alt="">
+                                                                        <img src="../Admin/' . $row['imagen2'] . '" alt="">
                                                                     </a>
                                                                     <div class="action_links">
-                                                                        <ul>
-                                                                            <li class="add_to_cart">
-                                                                                <a href="#" title="Add to Cart">
-                                                                                    <i class="fa fa-shopping-cart"></i>
-                                                                                </a>
-                                                                            </li>
-                                                                            <li class="wishlist">
-                                                                                <a href="#" title="Add to Wishlist">
-                                                                                    <i class="fa fa-heart-o"></i>
-                                                                                </a>
-                                                                            </li>
-                                                                            <li class="compare">
-                                                                                <a href="#" title="Add to Compare">
-                                                                                    <i class="fa fa-random"></i>
-                                                                                </a>
-                                                                            </li>
-                                                                            <li class="quick_button">
-                                                                                <a href="#" data-toggle="modal" data-target="#modal_box" title="Quick View">
-                                                                                    <i class="fa fa-eye"></i>
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
+                                                                       
                                                                     </div>
                                                                 </div>
                                                                 <figcaption class="product_content">
@@ -831,8 +760,8 @@ $conexion->close();
                                                                         </ul>
                                                                     </div>
                                                                     <div class="price_box">
-                                                                        <span class="old_price">COP ' . number_format($row['precio'], 0, ',', '.') . '</span>
-                                                                        <span class="current_price">COP ' . number_format($row['descuento'], 0, ',', '.') . '</span>
+                                                                        <span class="old_price">COP ' . number_format($row['descuento'], 0, ',', '.') . '</span>
+                                                                        <span class="current_price">COP ' .number_format($row['precio'], 0, ',', '.') . '</span>
                                                                     </div>
                                                                 </figcaption>
                                                             </figure>
@@ -865,7 +794,7 @@ $conexion->close();
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6">
                         <div class="copyright_area">
-                            <p>Copyright &copy; 2021 <a href="#">Perfume Store </a>All right Reserved.</p>
+                            <p>Copyright &copy; 2024 <a href="#">Imperial Essences </a>Todos los derechos reservados</p>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6">
@@ -886,133 +815,7 @@ $conexion->close();
     </footer>
     <!-- footer section ends -->
 
-    <!-- modal section starts  -->
-    <div class="modal fade" id="modal_box" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <button type="button" data-dismiss="modal" aria-label="close" class="close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <div class="modal_body">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-lg-5 col-md-5 col-sm-12">
-                                <div class="modal_tab">
-                                    <div class="tab-content product-details-large">
-                                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
-                                            <div class="modal_tab_img">
-                                                <a href="#"><img src="images/new-product/N1-1.png" alt=""></a>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="tab2" role="tabpanel">
-                                            <div class="modal_tab_img">
-                                                <a href="#"><img src="images/new-product/N2-1.png" alt=""></a>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="tab3" role="tabpanel">
-                                            <div class="modal_tab_img">
-                                                <a href="#"><img src="images/new-product/N3.png" alt=""></a>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="tab4" role="tabpanel">
-                                            <div class="modal_tab_img">
-                                                <a href="#"><img src="images/new-product/N4-1.png" alt=""></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal_tab_button">
-                                        <ul class="nav product_navactive owl-carousel" role="tablist">
-                                            <li>
-                                                <a href="#tab1" class="nav-link active" data-toggle="tab" role="tab"
-                                                    aria-controls="tab1" aria-selected="false">
-                                                    <img src="images/new-product/N1-1.png" alt="">
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#tab2" class="nav-link" data-toggle="tab" role="tab"
-                                                    aria-controls="tab2" aria-selected="false">
-                                                    <img src="images/new-product/N2-1.png" alt="">
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#tab3" class="nav-link" data-toggle="tab" role="tab"
-                                                    aria-controls="tab3" aria-selected="false">
-                                                    <img src="images/new-product/N3.png" alt="">
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#tab4" class="nav-link" data-toggle="tab" role="tab"
-                                                    aria-controls="tab4" aria-selected="false">
-                                                    <img src="images/new-product/N4-1.png" alt="">
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-7 col-md-7 col-sm-12">
-                                <div class="modal_right">
-                                    <div class="modal_title mb-10">
-                                        <h2>Paco Rabbane Men Invictus</h2>
-                                    </div>
-                                    <div class="modal_price mb-10">
-                                        <span class="new_price">COP 7600</span>
-                                        <span class="old_price">COP 8100</span>
-                                    </div>
-                                    <div class="modal_description mb-15">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veritatis earum
-                                            nesciunt consequatur deleniti nam dicta eligendi iusto quaerat dolores
-                                            debitis, est natus omnis consequuntur sequi. Ipsam sint rerum minus eos?</p>
-                                    </div>
-                                    <div class="variants_selects">
-                                        <div class="variants_size">
-                                            <h2>Size</h2>
-                                            <select class="select_option">
-                                                <option value="1" selected>10ml</option>
-                                                <option value="1">25ml</option>
-                                                <option value="1">50ml</option>
-                                                <option value="1">100ml</option>
-                                                <option value="1">250ml</option>
-                                            </select>
-                                        </div>
-                                        <div class="variants_fragrance">
-                                            <h2>Fragrance</h2>
-                                            <select class="select_option">
-                                                <option value="1" selected>Rose</option>
-                                                <option value="1">Chocolate</option>
-                                                <option value="1">Sweet</option>
-                                                <option value="1">Fruit</option>
-                                                <option value="1">Intense</option>
-                                            </select>
-                                        </div>
-                                        <div class="modal_add_to_cart">
-                                            <form action="#">
-                                                <input type="number" min="1" max="100" step="1" value="1">
-                                                <button type="submit">Add to cart</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="modal_social">
-                                        <h2>Follow us on</h2>
-                                        <ul>
-                                            <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                            <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                            <li class="pinterest"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                                            <li class="google-plus"><a href="#"><i class="fa fa-google-plus"></i></a>
-                                            </li>
-                                            <li class="linkedin"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
+   
     <!-- modal section ends -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>

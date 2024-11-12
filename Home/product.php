@@ -1,6 +1,27 @@
 
 <?php  
 include ("../db/conexion.php");
+session_start();
+ // Asegúrate de que la sesión esté iniciada
+
+// Verificar si el usuario está autenticado
+if (isset($_SESSION['user'])) {
+    // Obtener los datos del usuario almacenados en la sesión
+    $userData = $_SESSION['user'];
+
+    // Ejemplo: obtener el nombre y correo del usuario
+    $nombre = $userData['name'];  // El nombre del usuario (lo obtienes al autenticarse)
+    $correo = $userData['email']; // El correo del usuario (también al autenticarse)
+} else {
+    // Si no hay sesión activa, redirigir al usuario a la página de inicio de sesión
+    if (isset($_SESSION['usuario'])){
+
+    $correo = $_SESSION['usuario'];
+
+    }else{
+        header("Location : login.php");
+    }
+}
 
 if (isset($_GET['id']) || isset($_GET['nit'])) {
     // Si 'id' existe, lo utiliza; si no, asume que 'nit' existe
@@ -79,23 +100,6 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
 			</div>
 			<div class="header_account">
 				<ul>
-					<li class="language">
-						<a href="#"><img src="images/icon/language.png" alt="English"> EN <i
-								class="fa fa-angle-down"></i></a>
-						<ul class="dropdown_language">
-							<li><a href="#">Inglés</a></li>
-							<li><a href="#">Alemán</a></li>
-							<li><a href="#">indio</a></li>
-						</ul>
-					</li>
-					<li class="currency">
-						<a href="#">COP <i class="fa fa-angle-down"></i></a>
-						<ul class="dropdown_currency">
-							<li><a href="#">US - EEUU </a></li>
-
-
-						</ul>
-					</li>
 					<li class="top_links">
 						<a href="#">Mi cuenta <i class="fa fa-angle-down"></i></a>
 						<ul class="dropdown_links">
@@ -125,63 +129,7 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
 							<span class="item_count">4</span>
 						</a>
 					</li>
-					<li class="mini_cart_wrapper">
-						<a href="javascript:void(0)">
-							<i class="fa fa-shopping-cart"></i>
-							<span class="item_count">2</span>
-						</a>
-						<div class="mini_cart mini_cart2">
-							<div class="cart_gallery">
-								<div class="cart_item">
-									<div class="cart_img">
-										<a href="#"><img src="images/small-product/mini1.png" alt="Perfume"></a>
-									</div>
-									<div class="cart_info">
-										<a href="#">Hugo Boss</a>
-										<p><span>COP 3640</span> X 1</p>
-									</div>
-									<div class="cart_remove">
-										<a href="#"><i class="fa fa-times"></i></a>
-									</div>
-								</div>
-								<div class="cart_item">
-									<div class="cart_img">
-										<a href="#"><img src="images/small-product/mini2.png" alt="Perfume"></a>
-									</div>
-									<div class="cart_info">
-										<a href="#">Bvlgari</a>
-										<p><span>COP 8350</span> X 1</p>
-									</div>
-									<div class="cart_remove">
-										<a href="#"><i class="fa fa-times"></i></a>
-									</div>
-								</div>
-							</div>
-							<div class="mini_cart_table">
-								<div class="cart_table_border">
-									<div class="cart_total">
-										<span>Sub Total :</span>
-										<span class="price">COP 11990</span>
-									</div>
-
-									<div class="cart_total mt-10">
-										<span>Total :</span>
-										<span class="price">COP 11990</span>
-									</div>
-
-								</div>
-							</div>
-							<div class="mini_cart_footer">
-								<div class="cart_button">
-									<a href="#">View Cart</a>
-								</div>
-								<div class="cart_button">
-									<a href="#">Checkout</a>
-								</div>
-							</div>
-						</div>
-						<!-- mini cart ends here -->
-					</li>
+					
 				</ul>
 			</div>
 
@@ -231,26 +179,21 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
 							</li>
 						</ul>
 					</li>
-					<li class="menu-item-has-children">
-						<a href="#">Blog</a>
-						<ul class="sub-menu">
-							<li><a href="#">Newsletter</a></li>
-							<li><a href="#">Social Media</a></li>
-						</ul>
-					</li>
-					<li class="menu-item-has-children">
-						<a href="#">My Account</a>
-					</li>
+					
 					<li class="menu-item-has-children">
 						<a href="#">About Us</a>
 					</li>
 					<li class="menu-item-has-children">
-						<a href="#">User</a>
-						<ul class="sub-menu">
-							<li><a href="#">Login In</a></li>
-							<li><a href="#">Sign up</a></li>
-						</ul>
-					</li>
+                        <a href="#">User</a>
+                        <ul class="sub-menu">
+                            <?php if (!isset($correo)): ?>
+                                <li><a href="login.php">Login In</a></li>
+                            <?php else: ?>
+                                <li><a href="perfil.php">Perfil</a></li>
+                                <li><a href="../Registro&Seccion/cerrar_sesion.php">Cerrar Sesion</a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
 				</ul>
 			</div>
 
@@ -337,21 +280,20 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
                                                 </ul>
                                             </div>
                                         </li>
-                                        <li>
-                                            <a href="#">Blog <i class="fa fa-angle-down"></i></a>
-                                            <ul class="sub_menu pages">
-                                                <li><a href="#">Newsletter</a></li>
-                                                <li><a href="#">Social Media</a></li>
-                                            </ul>
-                                        </li>
                                         <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Contact Us</a></li>
+                                        
                                         <li>
                                             <a href="#">User <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="login.php">Login In</a></li>
-                                                <li><a href="#">Sign Up</a></li>
-                                            </ul>
+                                            <?php if (!isset($correo)): ?>
+                                            <!-- Mostrar solo si el usuario no está logueado -->
+                                            <li><a href="login.php">Login In</a></li>
+                                        <?php else: ?>
+                                            <!-- Mostrar solo si el usuario está logueado -->
+                                            <li><a href="perfil.php">Perfil</a></li>
+                                            <li><a href="../Registro&Seccion/cerrar_sesion.php">Cerrar sesión</a></li>
+                                        <?php endif; ?>
+                                        </ul>
                                         </li>
                                     </ul>
                                 </nav>
@@ -374,73 +316,6 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
                                                 </form>
                                             </div>
                                         </li>
-                                        <li class="header_wishlist">
-                                            <a href="#">
-                                                <i class="fa fa-heart-o"></i>
-                                                <span class="item_count">4</span>
-                                            </a>
-                                        </li>
-                                        <li class="mini_cart_wrapper">
-                                            <a href="javascript:void(0)">
-                                                <i class="fa fa-shopping-cart"></i>
-                                                <span class="item_count">2</span>
-                                            </a>
-
-                                            <!-- mini cart  -->
-                                            <div class="mini_cart mini_cart2">
-                                                <div class="cart_gallery">
-                                                    <div class="cart_item">
-                                                        <div class="cart_img">
-                                                            <a href="#"><img src="images/small-product/mini1.png"
-                                                                    alt="Perfume"></a>
-                                                        </div>
-                                                        <div class="cart_info">
-                                                            <a href="#">Hugo Boss</a>
-                                                            <p><span>COP 3640</span> X 1</p>
-                                                        </div>
-                                                        <div class="cart_remove">
-                                                            <a href="#"><i class="fa fa-times"></i></a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="cart_item">
-                                                        <div class="cart_img">
-                                                            <a href="#"><img src="images/small-product/mini2.png"
-                                                                    alt="Perfume"></a>
-                                                        </div>
-                                                        <div class="cart_info">
-                                                            <a href="#">Bvlgari</a>
-                                                            <p><span>COP 8350</span> X 1</p>
-                                                        </div>
-                                                        <div class="cart_remove">
-                                                            <a href="#"><i class="fa fa-times"></i></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mini_cart_table">
-                                                    <div class="cart_table_border">
-                                                        <div class="cart_total">
-                                                            <span>Sub Total :</span>
-                                                            <span class="price">COP 11990</span>
-                                                        </div>
-
-                                                        <div class="cart_total mt-10">
-                                                            <span>Total :</span>
-                                                            <span class="price">COP 11990</span>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <div class="mini_cart_footer">
-                                                    <div class="cart_button">
-                                                        <a href="../Carrito/index.php">View Cart</a>
-                                                    </div>
-                                                    <div class="cart_button">
-                                                        <a href="#">Checkout</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- mini cart ends -->
-                                        </li>
                                     </ul>
                                 </div>
                                 <div class="header_account">
@@ -454,21 +329,6 @@ if (isset($_GET['id']) || isset($_GET['nit'])) {
                                                 <li><a href="#">My Account</a></li>
                                                 <li><a href="#">Shopping cart</a></li>
                                                 <li><a href="#">Wishlist</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="language">
-                                            <a href="#"><img src="images/icon/language.png" alt="English"> EN <i
-                                                    class="fa fa-angle-down"></i></a>
-                                            <ul class="dropdown_language">
-                                                <li><a href="#">English</a></li>
-                                                <li><a href="#">Spanish</a></li>
-                                                
-                                            </ul>
-                                        </li>
-                                        <li class="currency">
-                                            <a href="#">COP <i class="fa fa-angle-down"></i></a>
-                                            <ul class="dropdown_currency">
-                                                <li><a href="#">US - EEUU</a></li>
                                             </ul>
                                         </li>
                                     </ul>

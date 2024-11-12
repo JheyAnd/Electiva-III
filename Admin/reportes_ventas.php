@@ -1,27 +1,69 @@
-<?php
-// Incluir el archivo de configuración si existe
-if (file_exists('config.php')) {
-    require_once 'config.php';
-}
 
-// Datos de ejemplo para el informe de ventas
-$salesData = [
-    'totalSales' => 15000,
-    'averageOrderValue' => 250,
-    'topSellingProduct' => 'Widget X',
-    'recentSales' => [
-        ['id' => 1, 'date' => '2023-05-01', 'product' => 'Widget X', 'quantity' => 5, 'total' => 500],
-        ['id' => 2, 'date' => '2023-05-02', 'product' => 'Gadget Y', 'quantity' => 3, 'total' => 450],
-        ['id' => 3, 'date' => '2023-05-03', 'product' => 'Tool Z', 'quantity' => 2, 'total' => 300],
-        ['id' => 4, 'date' => '2023-05-04', 'product' => 'Widget X', 'quantity' => 4, 'total' => 400],
-        ['id' => 5, 'date' => '2023-05-05', 'product' => 'Gadget Y', 'quantity' => 1, 'total' => 150],
-    ]
-];
+<?php
+include ('../db/conexion.php');
+session_start();
+// Consulta para obtener datos de ventas de la base de datos
+$query = "SELECT pv.id, pv.cantidad, pv.precio, pv.subtotal, v.fecha, p.nombre AS producto
+          FROM productos_ventas AS pv
+          JOIN ventas AS v ON pv.id_ventas = v.id
+          JOIN productos AS p ON pv.id_productos = p.id
+          ORDER BY v.fecha DESC LIMIT 5";
+$result = $conexion->query($query);
+
+// Variables para el informe
+$totalSales = 0;
+$recentSales = [];
+$topSellingProduct = "";
+$productSales = [];
+$salesData = ['recentSales' => [], 'dates' => [], 'totals' => []];
+
+// Procesar los resultados de la consulta
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        // Agregar cada venta a recentSales
+        $recentSales[] = [
+            'id' => $row['id'],
+            'date' => $row['fecha'],
+            'product' => $row['producto'],
+            'quantity' => $row['cantidad'],
+            'total' => $row['subtotal']
+        ];
+
+        // Sumar el total de ventas
+        $totalSales += $row['subtotal'];
+
+        // Contabilizar las ventas por producto
+        if (!isset($productSales[$row['producto']])) {
+            $productSales[$row['producto']] = $row['cantidad'];
+        } else {
+            $productSales[$row['producto']] += $row['cantidad'];
+        }
+
+        // Datos para el gráfico
+        $salesData['dates'][] = $row['fecha'];
+        $salesData['totals'][] = $row['subtotal'];
+    }
+
+    // Calcular el valor promedio de orden
+    $averageOrderValue = $totalSales / count($recentSales);
+
+    // Producto más vendido
+    arsort($productSales);
+    $topSellingProduct = key($productSales);
+} else {
+    echo "No hay ventas recientes.";
+}
 
 // Función para formatear números como moneda
 function formatCurrency($number) {
     return '$' . number_format($number, 2);
 }
+
+// Incluir el encabezado y el menú
+if (file_exists('header.php')) {
+    require_once 'header.php';
+}
+require "menu.php";
 
 // Incluir el encabezado si existe
 if (file_exists('header.php')) {
@@ -335,24 +377,24 @@ require "menu.php";
             <div class="card fade-in">
                 <h3>Ventas Totales</h3>
                 <div class="card-content">
-                    <p class="big-number"><?php echo formatCurrency($salesData['totalSales']); ?></p>
+                    <p class="big-number"><?php echo formatCurrency($totalSales); ?></p>
                 </div>
             </div>
             <div class="card fade-in">
                 <h3>Valor Promedio de Orden</h3>
                 <div class="card-content">
-                    <p class="big-number"><?php echo formatCurrency($salesData['averageOrderValue']); ?></p>
+                    <p class="big-number"><?php echo formatCurrency($averageOrderValue); ?></p>
                 </div>
             </div>
             <div class="card fade-in">
                 <h3>Producto Más Vendido</h3>
                 <div class="card-content">
-                    <p class="big-number"><?php echo htmlspecialchars($salesData['topSellingProduct']); ?></p>
+                    <p class="big-number"><?php echo htmlspecialchars($topSellingProduct); ?></p>
                 </div>
             </div>
         </div>
-        <div class="card fade-in" style="margin-top: 20px;">
-            <h3>Gráfico de Ventas</h3>
+        <div class="chart-container">
+            <h3>Ventas Recientes</h3>
             <canvas id="salesChart"></canvas>
         </div>
         <div class="card fade-in" style="margin-top: 20px;">
@@ -367,7 +409,7 @@ require "menu.php";
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($salesData['recentSales'] as $sale): ?>
+                    <?php foreach ($recentSales as $sale): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($sale['date']); ?></td>
                             <td><?php echo htmlspecialchars($sale['product']); ?></td>
@@ -387,10 +429,10 @@ require "menu.php";
     var salesChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: <?php echo json_encode(array_column($salesData['recentSales'], 'date')); ?>,
+            labels: <?php echo json_encode($salesData['dates']); ?>,
             datasets: [{
                 label: 'Ventas',
-                data: <?php echo json_encode(array_column($salesData['recentSales'], 'total')); ?>,
+                data: <?php echo json_encode($salesData['totals']); ?>,
                 backgroundColor: '#2c3e50',
             }]
         },
@@ -407,13 +449,13 @@ require "menu.php";
             }
         }
     });
+</script>
 
 <?php
 // Incluir el pie de página si existe
 if (file_exists('footer.php')) {
     require_once 'footer.php';
 } else {
-    // Si no existe un pie de página, cerramos las etiquetas body y html
     echo '</body></html>';
 }
 ?>

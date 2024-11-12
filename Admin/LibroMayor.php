@@ -1,3 +1,57 @@
+<?php
+include('../db/conexion.php');
+session_start();
+// Obtener los datos de productos_ventas
+$sqlVentas = "SELECT id, id_ventas, id_productos, cantidad, precio, subtotal FROM productos_ventas";
+$resultVentas = $conexion->query($sqlVentas);
+
+// Obtener los datos de ventas
+$sqlVentasTotales = "SELECT id, usuario_id, total, fecha FROM ventas";
+$resultVentasTotales = $conexion->query($sqlVentasTotales);
+
+// Obtener los datos de productos
+$sqlProductos = "SELECT id, nombre, descripcion, proveedor_id, fragancia_id, marca, tipo_fragancia, tamaño, cantidad, precio_x1, descuento_x1, imagen1, imagen2, imagen3, imagen4, imagen5, fecha_creacion, fecha_actualizacion, categoria_id, nit FROM productos";
+$resultProductos = $conexion->query($sqlProductos);
+
+// Calcular el total del inventario (cantidad * precio de cada producto)
+$totalInventario = 0;
+while ($producto = $resultProductos->fetch_assoc()) {
+    $totalInventario += $producto['cantidad'] * $producto['precio_x1'];
+}
+// Consultar el dinero total de ventas
+$ventasQuery = "SELECT SUM(total) AS dineroVentas FROM ventas";
+$ventasResult = $conexion->query($ventasQuery);
+$dineroVentas = $ventasResult->fetch_assoc()['dineroVentas'] ?? 0;
+
+// Consultar el valor total del inventario de productos
+$inventarioQuery = "SELECT SUM(cantidad * precio_x1) AS valorInventario FROM productos";
+$inventarioResult = $conexion->query($inventarioQuery);
+$valorInventario = $inventarioResult->fetch_assoc()['valorInventario'] ?? 0;
+
+// 1. Inicio de Año - Valor total del inventario
+$queryInventario = "SELECT SUM(cantidad * precio_x1) AS total_inventario FROM productos";
+$resultInventario = mysqli_query($conexion, $queryInventario);
+$rowInventario = mysqli_fetch_assoc($resultInventario);
+$valorInventarioInicial = $rowInventario['total_inventario'];
+
+// 2. Compra de Producto - Detecta nuevos productos
+$queryCompras = "SELECT SUM(precio_x1 * cantidad) AS total_compras FROM productos WHERE fecha_creacion >= '2024-01-01'";
+$resultCompras = mysqli_query($conexion, $queryCompras);
+$rowCompras = mysqli_fetch_assoc($resultCompras);
+$totalCompras = $rowCompras['total_compras'];
+
+// 3. Venta de Producto - Total de ventas realizadas
+$queryVentas = "SELECT SUM(total) AS total_ventas FROM ventas";
+$resultVentas = mysqli_query($conexion, $queryVentas);
+$rowVentas = mysqli_fetch_assoc($resultVentas);
+$totalVentas = $rowVentas['total_ventas'];
+
+// Calcula saldo actual (Ejemplo: saldo inicial + ventas - compras)
+$saldoActual = $valorInventarioInicial + $totalVentas - $totalCompras;
+// Cerrar la conexión
+$conexion->close();
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -276,71 +330,64 @@
             <button class="generate-btn" id="generateReport">Generar archivo</button>
 
             <table class="ledger-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Débito</th>
-                        <th>Crédito</th>
-                        <th>Saldo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>01/01/2024</td>
-                        <td>Inicio de Año</td>
-                        <td>$10,000</td>
-                        <td>$0</td>
-                        <td>$10,000</td>
-                    </tr>
-                    <tr>
-                        <td>10/01/2024</td>
-                        <td>Compra de Producto</td>
-                        <td>$1,000</td>
-                        <td>$0</td>
-                        <td>$9,000</td>
-                    </tr>
-                    <tr>
-                        <td>15/01/2024</td>
-                        <td>Venta de Producto</td>
-                        <td>$0</td>
-                        <td>$2,000</td>
-                        <td>$11,000</td>
-                    </tr>
-                    <tr>
-                        <td>20/01/2024</td>
-                        <td>Gastos Operativos</td>
-                        <td>$500</td>
-                        <td>$0</td>
-                        <td>$10,500</td>
-                    </tr>
-                    <!-- Agrega más filas según sea necesario -->
-                </tbody>
-            </table>
-
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Débito</th>
+            <th>Crédito</th>
+            <th>Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>01/01/2024</td>
+            <td>Inicio de Año</td>
+            <td>$<?php echo number_format($valorInventarioInicial, 2); ?></td>
+            <td>$0</td>
+            <td>$<?php echo number_format($valorInventarioInicial, 2); ?></td>
+        </tr>
+        <tr>
+            <td>10/01/2024</td>
+            <td>Compra de Producto</td>
+            <td>$<?php echo number_format($totalCompras, 2); ?></td>
+            <td>$0</td>
+            <td>$<?php echo number_format($valorInventarioInicial - $totalCompras, 2); ?></td>
+        </tr>
+        <tr>
+            <td>15/01/2024</td>
+            <td>Venta de Producto</td>
+            <td>$0</td>
+            <td>$<?php echo number_format($totalVentas, 2); ?></td>
+            <td>$<?php echo number_format($saldoActual, 2); ?></td>
+        </tr>
+        <!-- Agrega más filas según sea necesario -->
+    </tbody>
+</table>
             <h2>Totales de Activos</h2>
-            <table class="assets-table">
-                <thead>
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Monto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Dinero De Ventas</td>
-                        <td>$11,000</td>
-                    </tr>
-                    <tr>
-                        <td>Inventario De Productos</td>
-                        <td>$3,000</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Activos</strong></td>
-                        <td><strong>$19,000</strong></td>
-                    </tr>
-                </tbody>
-            </table>
+<table class="assets-table">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Dinero De Ventas</td>
+            <td>$<?php echo number_format($dineroVentas, 2); ?></td>
+        </tr>
+        <tr>
+            <td>Inventario De Productos</td>
+            <td>$<?php echo number_format($valorInventario, 2); ?></td>
+        </tr>
+        <tr>
+            <td><strong>Total Activos</strong></td>
+            <td><strong>$<?php echo number_format($dineroVentas + $valorInventario, 2); ?></strong></td>
+        </tr>
+    </tbody>
+</table>
+
 
             <!-- Modal para seleccionar mes y año -->
             <div id="myModal" class="modal">

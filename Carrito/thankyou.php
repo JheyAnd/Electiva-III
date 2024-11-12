@@ -50,7 +50,8 @@ for ($i = 0; $i < count($arreglo); $i++) {
         " . $arreglo[$i]['Precio'] * $arreglo[$i]['Cantidad'] . "
     )") or die($conexion->error);
 
-    $conexion -> query("update productos set cantindad = cantidad-".$arreglo[$i]['Cantidad']."where id=".$arreglo[$i]['Id'])or die($conexion->error);
+    $conexion->query("UPDATE productos SET cantidad = cantidad - ".$arreglo[$i]['Cantidad']." WHERE id = ".$arreglo[$i]['Id']) or die($conexion->error);
+
 }
 
 // Inserción en la tabla envios
@@ -99,7 +100,7 @@ unset($_SESSION['carrito']);
             <span class="icon-check_circle display-3 text-success"></span>
             <h2 class="display-3 text-black">Thank you!</h2>
             <p class="lead mb-5">You order was successfuly completed.</p>
-            <p><a href="shop.html" class="btn btn-sm btn-primary">Back to shop</a></p>
+            <p><a href="../Home/index.php" class="btn btn-sm btn-primary">Back to shop</a></p>
           </div>
         </div>
       </div>

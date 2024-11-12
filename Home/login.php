@@ -18,7 +18,7 @@
     <div class="login-container">
         <div class="login-form">
             <img src="images/logo.png" alt="Imperial Essencial Logo" class="logo">
-            <h2>Welcome Back</h2>
+            <a href=""></a><h2>Welcome Back</h2>
 
             <!-- Mostrar mensaje de error si existe -->
             <?php if (isset($error) && !empty($error)): ?>

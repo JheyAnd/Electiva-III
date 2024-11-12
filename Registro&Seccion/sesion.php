@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: vendedor_dashboard.php"); // Cambia la ruta si es necesario
                     break;
                 case 3: // Cliente
-                    header("Location: bienvenida.php");
+                    header("Location: ../Home/index.php");
                     break;
                 default:
                     echo "Tipo de usuario no reconocido.";
